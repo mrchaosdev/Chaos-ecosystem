@@ -1,4 +1,4 @@
-export type Page = 'id' | 'board' | 'market' | 'bridge'
+export type Page = 'id' | 'board' | 'market' | 'bridge' | 'docs'
 
 export interface ChaosProfile {
   reputationScore: bigint

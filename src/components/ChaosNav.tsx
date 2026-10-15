@@ -15,6 +15,7 @@ const NAV_ITEMS: { id: Page; label: string }[] = [
   { id: 'board', label: 'BOARD' },
   { id: 'market', label: 'MARKET' },
   { id: 'bridge', label: 'BRIDGE' },
+  { id: 'docs', label: 'DOCS' },
 ]
 
 export function ChaosNav({ activePage, onNavigate }: ChaosNavProps) {

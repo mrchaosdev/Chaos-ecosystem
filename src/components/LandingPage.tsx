@@ -191,7 +191,7 @@ function Stat({ v, l, accent, delay }: { v: string; l: string; accent?: boolean;
 }
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
-export function LandingPage({ onEnter }: { onEnter: () => void }) {
+export function LandingPage({ onEnter, onDocs }: { onEnter: () => void; onDocs: () => void }) {
   return (
     <div className="relative text-white overflow-x-hidden"
       style={{ background: '#0a0a0a', fontFamily: "'JetBrains Mono', monospace" }}>
@@ -202,11 +202,14 @@ export function LandingPage({ onEnter }: { onEnter: () => void }) {
         <span className="font-mono text-sm font-black tracking-widest">
           CHAOS<span style={{ color: ACCENT }}>//</span>
         </span>
-        <button onClick={onEnter}
-          className="font-mono text-[9px] tracking-[0.18em] px-3 sm:px-4 py-2 text-white/35 hover:text-[#ff4d00] transition-colors duration-200"
-          style={{ border: '1px solid rgba(255,255,255,0.08)' }}>
-          LAUNCH APP →
-        </button>
+        <div className="flex items-center gap-2 sm:gap-4">
+          <button onClick={onDocs} className="font-mono text-[9px] tracking-[0.18em] px-2 sm:px-3 py-2 text-white/35 hover:text-[#ff4d00] transition-colors duration-200">DOCS</button>
+          <button onClick={onEnter}
+            className="font-mono text-[9px] tracking-[0.18em] px-3 sm:px-4 py-2 text-white/35 hover:text-[#ff4d00] transition-colors duration-200"
+            style={{ border: '1px solid rgba(255,255,255,0.08)' }}>
+            LAUNCH APP →
+          </button>
+        </div>
       </nav>
 
       {/* HERO */}
