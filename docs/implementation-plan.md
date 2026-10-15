@@ -1,102 +1,24 @@
-Mình đã có đủ thông tin. Đây là plan đầy đủ:
+# Project status and next steps
 
----
+This file replaces the original Arc Studio build prompt with the current repository state. The contracts and frontend described here are the Arc Testnet export; see [architecture](architecture.md), [contracts](contracts.md), and [security](security.md) for implementation details.
 
-## CHAOS ECOSYSTEM — BUILD PLAN
+## Current state
 
-### Phase 1: ChaosID
+- Chaos Ecosystem is a standalone Vite app deployed at [chaos-ecosystem.vercel.app](https://chaos-ecosystem.vercel.app/).
+- It contains ChaosID, ChaosBoard, ChaosMarket, and a Bridge page.
+- ChaosID, ChaosBoard, and ChaosMarket have Arc Testnet deployments listed in the root README and `contracts/contract-metadata/`.
+- ChaosBoard and ChaosMarket include best-effort calls to ChaosID when a payout completes. ChaosID must authorize both contract addresses for those writes to succeed.
+- The frontend has links to ChaosPay, and ChaosPay links back. ChaosPay is on Arc Mainnet; this app is on Arc Testnet. There is no shared API, backend account, or cross-chain reputation integration.
+- The contracts have no project-specific Foundry tests in this export.
 
-**Smart Contracts:**
-- `ChaosID.sol` — lưu profile onchain: địa chỉ ví, reputation score, join timestamp
-- Reputation tăng tự động khi có giao dịch từ ChaosBoard và ChaosMarket
-- Đọc thêm lịch sử từ InvoiceRegistry của ChaosPayment (read-only, không cần modify)
+## Recommended order
 
-**Frontend:**
-- Profile card với Three.js sphere — kích thước/màu thay đổi theo reputation score
-- Activity feed đọc events onchain thật
-- Shared nav bar dùng cho cả ecosystem
+1. **Make the escrow rules testable.** Add Foundry tests for every state transition, exact token accounting, expiry boundaries, unauthorized calls, failed token transfers, and the reputation callback.
+2. **Resolve the contract-level product gaps.** Decide how bounty deadlines treat submitted work; define a real dispute or refund path for Market; make UI wording match the contract; and decide what happens to funds when a party disappears.
+3. **Validate the deployed testnet configuration.** Confirm the deployed code, constructor token/ChaosID addresses, current owner, and `authorizedCallers` state from Arc Testnet. Exercise the complete user flows with test USDC.
+4. **Decide whether mainnet is appropriate.** Only after the contract design, tests, and an independent security review should a mainnet deployment be considered. Testnet addresses must never be reused as mainnet configuration.
+5. **Integrate ChaosPay data as a separate read.** If useful, read ChaosPay's Arc Mainnet InvoiceRegistry in a read-only view. Keep invoice/payment history clearly separated from Arc Testnet reputation unless a reviewed cross-chain model is designed.
 
-**Animation:**
-- Three.js sphere (reputation viz)
-- Framer Motion cho activity feed
-- GSAP counter cho số liệu
+## Deliberately not shared today
 
----
-
-### Phase 2: ChaosBoard
-
-**Smart Contracts:**
-- `ChaosBoard.sol` — đăng bounty, lock USDC escrow, claim, submit, approve/dispute
-- Tích hợp gọi `ChaosID.sol` để cộng reputation khi hoàn thành
-
-**Frontend:**
-- Danh sách bounty với filter (Open / In Progress / Done)
-- Flow: Post bounty → Lock USDC → Claim → Submit proof → Approve → Giải ngân
-- Bottom sheet cho post bounty form (spring animation)
-
-**Animation:**
-- React Bits card hover physics
-- GSAP đếm tổng USDC đang locked
-- Framer Motion status badge flip
-
----
-
-### Phase 3: ChaosMarket
-
-**Smart Contracts:**
-- `ChaosMarket.sol` — list item, buy, escrow, confirm delivery, release/refund
-- Tích hợp `ChaosID.sol` cho reputation sau giao dịch
-
-**Frontend:**
-- Grid listing sản phẩm/dịch vụ
-- Escrow progress bar real-time
-- Buy flow với bottom sheet
-
----
-
-### Stack cụ thể
-
-| Layer | Công cụ |
-|---|---|
-| Chain | Arc Testnet (Chain ID 5042002) |
-| Smart contract | Solidity + Foundry + OpenZeppelin 5.1.0 |
-| Frontend | React + TypeScript + Vite |
-| Styling | Tailwind CSS |
-| Wallet | wagmi v2 + ConnectKit |
-| 3D | React Three Fiber + Three.js |
-| Animation | Framer Motion + GSAP |
-| UI components | React Bits (card physics) |
-| Icons | lucide-react + @web3icons/react |
-| Font | Space Grotesk (display) + JetBrains Mono (data) |
-| USDC | ERC-20 tại `0x3600...` (Arc Testnet) |
-
----
-
-### Thứ tự build
-
-```
-Phase 1: ChaosID
-  → Contract: ChaosID.sol
-  → UI: Profile page + 3D sphere + nav bar
-
-Phase 2: ChaosBoard
-  → Contract: ChaosBoard.sol (gọi ChaosID)
-  → UI: Bounty list + post + claim + approve flow
-
-Phase 3: ChaosMarket
-  → Contract: ChaosMarket.sol (gọi ChaosID)
-  → UI: Listing grid + buy + escrow flow
-```
-
----
-
-### Lưu ý quan trọng
-
-- Build và test trên **Arc Testnet** trước — không đụng mainnet trong quá trình dev
-- Tất cả contract có security review tự động trước khi deploy
-- ChaosPayment (mainnet) được đọc dữ liệu read-only — không modify contract đó
-- Reputation là onchain thật, không phải mock
-
----
-
-Bạn muốn bắt đầu Phase 1 (ChaosID) ngay không? Chuyển sang **Build mode** để mình bắt tay vào code.
+The apps run and deploy independently. Their current integration is cross-navigation plus the same wallet address when a user connects it to both. They do not share sessions, a database, API keys, contract state, or balances across chains.
