@@ -1,6 +1,7 @@
 import { ConnectKitButton } from 'connectkit'
 import { useAccount } from 'wagmi'
 import { NetworkArc } from '@web3icons/react'
+import { ArrowUpRight } from 'lucide-react'
 import { type Page } from '@/types'
 import { FaucetButton } from '@/components/FaucetButton'
 
@@ -49,6 +50,14 @@ export function ChaosNav({ activePage, onNavigate }: ChaosNavProps) {
                 )}
               </button>
             ))}
+            <a
+              href="https://chaospayment.xyz/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-mono text-[11px] tracking-[0.14em] px-4 py-4 text-white/25 transition-colors hover:text-white/60"
+            >
+              CHAOS PAY <ArrowUpRight className="inline size-3" />
+            </a>
           </nav>
         </div>
 
@@ -90,6 +99,15 @@ export function ChaosNav({ activePage, onNavigate }: ChaosNavProps) {
             )}
           </button>
         ))}
+        <a
+          href="https://chaospayment.xyz/"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="ChaosPay"
+          className="flex-1 font-mono text-[10px] tracking-[0.14em] py-2.5 text-center text-white/25 transition-colors hover:text-white/60"
+        >
+          PAY <ArrowUpRight className="inline size-3" />
+        </a>
       </div>
     </header>
   )
