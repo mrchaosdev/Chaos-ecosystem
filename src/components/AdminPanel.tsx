@@ -7,7 +7,6 @@ import { buildTxExplorerUrl, requireChain } from '@/onchain-facts'
 const CHAOS_ID_ADDRESS = '0x763cba888b02b29e3bf631fb78de732e439f54a9' as const
 const BOARD_ADDRESS    = '0x01bb68f66c9397d60db9f845f07dadbf0eb67ed7' as const
 const MARKET_ADDRESS   = '0x55203bc963be0731c8f013bc1de7f1fbb253b311' as const
-const OWNER_ADDRESS    = '0x5B12Ce46C7194aD57d143bC22847224047b1Ef42' as const
 const ARC_TESTNET_ID   = 5042002
 
 const CHAOS_ID_ABI = [
@@ -32,9 +31,9 @@ const CHAOS_ID_ABI = [
 ] as const
 
 function AuthCallerRow({
-  label, contractAddress, color,
+  label, contractAddress, color, isOwner,
 }: {
-  label: string; contractAddress: `0x${string}`; color: string
+  label: string; contractAddress: `0x${string}`; color: string; isOwner: boolean
 }) {
   const { address, chainId } = useAccount()
   const chain = requireChain(ARC_TESTNET_ID)
@@ -50,7 +49,6 @@ function AuthCallerRow({
 
   if (isSuccess) { void refetch() }
 
-  const isOwner = address?.toLowerCase() === OWNER_ADDRESS.toLowerCase()
   const canAct  = isOwner && chainId === ARC_TESTNET_ID
 
   const toggle = (authorize: boolean) => {
@@ -138,14 +136,14 @@ export function AdminPanel() {
   const { address } = useAccount()
   const [open, setOpen] = useState(false)
 
-  // Read actual owner from contract
+  // The owner is read from the contract, never hardcoded: a pinned address
+  // drifted from the real deployer once and hid the authorize buttons from it.
   const { data: onchainOwner } = useReadContract({
     address: CHAOS_ID_ADDRESS, abi: CHAOS_ID_ABI,
     functionName: 'owner', chainId: ARC_TESTNET_ID,
   })
 
-  const isOwner = address?.toLowerCase() === OWNER_ADDRESS.toLowerCase()
-    || (onchainOwner && address?.toLowerCase() === onchainOwner.toLowerCase())
+  const isOwner = Boolean(onchainOwner && address?.toLowerCase() === onchainOwner.toLowerCase())
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}
@@ -182,13 +180,13 @@ export function AdminPanel() {
 
               {!isOwner && (
                 <p className="font-mono text-[9px] text-white/20 leading-relaxed py-3">
-                  Only the contract owner (<span className="text-white/40">{OWNER_ADDRESS.slice(0,10)}…</span>) can authorize callers.
+                  Only the contract owner (<span className="text-white/40">{onchainOwner ? `${onchainOwner.slice(0,10)}…` : '…'}</span>) can authorize callers.
                   Connect with the owner wallet to enable reputation tracking.
                 </p>
               )}
 
-              <AuthCallerRow label="CHAOSBOARD" contractAddress={BOARD_ADDRESS} color="#ff4d00" />
-              <AuthCallerRow label="CHAOSMARKET" contractAddress={MARKET_ADDRESS} color="#00e5ff" />
+              <AuthCallerRow label="CHAOSBOARD" contractAddress={BOARD_ADDRESS} color="#ff4d00" isOwner={isOwner} />
+              <AuthCallerRow label="CHAOSMARKET" contractAddress={MARKET_ADDRESS} color="#00e5ff" isOwner={isOwner} />
             </div>
           </motion.div>
         )}

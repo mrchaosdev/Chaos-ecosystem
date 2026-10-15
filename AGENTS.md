@@ -40,6 +40,6 @@ A mini-ecosystem of three onchain apps built on Arc Testnet, interconnected via 
 ## Contract Integration Notes
 
 - ChaosBoard and ChaosMarket must be authorized callers on ChaosID to call `recordTransaction`.
-- Owner of all contracts: Circle platform deployer wallet `0x5B12Ce46C7194aD57d143bC22847224047b1Ef42`
+- Owner of all contracts: `0xa3039A54856ed74B5AEc999EeF3fc954Ab010Cf6` (read from `owner()` on Arc Testnet, 2026-10-15). The UI reads it from the contract; do not hardcode it.
 - To authorize Board/Market on ChaosID: call `setAuthorizedCaller(address, true)` from the owner wallet.
 - USDC approval required before `postBounty` (Board) and `buyListing` (Market).

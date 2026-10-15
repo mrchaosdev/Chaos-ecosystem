@@ -35,7 +35,7 @@ The current `lint` script runs Oxlint with `--fix`, so `bun run lint` and `bun r
 
 ## Deploy the frontend
 
-The frontend is a static Vite SPA. For a Vercel project, use the repository root as the project root, install with `bun install`, build with `bun run vite build`, and publish `dist`. Preserve the SPA fallback for `/id/<address>` deep links. The production site is [chaos-ecosystem.vercel.app](https://chaos-ecosystem.vercel.app/).
+The frontend is a static Vite SPA. For a Vercel project, use the repository root as the project root, install with `bun install`, build with `bun run vite build`, and publish `dist`. `vercel.json` rewrites every path to `index.html` so `/id/<address>` and `/docs` deep links reach the SPA router; without it Vercel answers 404 for any path but `/`. The production site is [chaos-ecosystem.vercel.app](https://chaos-ecosystem.vercel.app/).
 
 Frontend deployment does not deploy or change contracts. Pushing to the production branch may trigger the hosting provider's production build, depending on the Vercel Git settings.
 
