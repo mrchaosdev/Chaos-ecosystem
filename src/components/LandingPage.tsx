@@ -6,6 +6,8 @@
 import { useRef, useEffect, useState } from 'react'
 import { motion, AnimatePresence, useInView } from 'framer-motion'
 import { MagneticButton } from './MagneticButton'
+import { LanguagePicker } from '@/components/LanguagePicker'
+import { useLocale } from '@/i18n/LocaleProvider'
 
 const ACCENT = '#ff4d00'
 const BOARD_COLOR = '#ffd700'
@@ -42,10 +44,14 @@ function GlitchText({ text, className, style }: { text: string; className?: stri
 const WORDS = ['IDENTITY', 'TRUST', 'BOUNTIES', 'REPUTATION', 'MARKET']
 function WordCycle() {
   const [i, setI] = useState(0)
+  const { locale } = useLocale()
+  const words = locale === 'vi' ? ['HỒ SƠ', 'UY TÍN', 'NHIỆM VỤ', 'REPUTATION', 'THỊ TRƯỜNG']
+    : locale === 'zh' ? ['身份', '信任', '任务', '声誉', '市场']
+      : locale === 'ru' ? ['ПРОФИЛЬ', 'ДОВЕРИЕ', 'ЗАДАЧИ', 'РЕПУТАЦИЯ', 'РЫНОК'] : WORDS
   useEffect(() => {
-    const t = setInterval(() => setI(n => (n + 1) % WORDS.length), 2000)
+    const t = setInterval(() => setI(n => (n + 1) % words.length), 2000)
     return () => clearInterval(t)
-  }, [])
+  }, [words.length])
   return (
     <span className="inline-block relative overflow-hidden align-bottom" style={{ minWidth: '13ch' }}>
       <AnimatePresence mode="wait">
@@ -53,7 +59,7 @@ function WordCycle() {
           initial={{ y: '110%', opacity: 0 }} animate={{ y: '0%', opacity: 1 }} exit={{ y: '-110%', opacity: 0 }}
           transition={{ duration: 0.38, ease: [0.16, 1, 0.3, 1] }}
           style={{ color: ACCENT }}>
-          {WORDS[i]}
+          {words[i]}
         </motion.span>
       </AnimatePresence>
     </span>
@@ -152,12 +158,6 @@ function AppCard({ n, tag, name, desc, accent, address, delay }: {
 }
 
 // ─── How step ─────────────────────────────────────────────────────────────────
-const STEPS = [
-  { n: '01', title: 'REGISTER ONCE', body: 'Call ChaosID.register(). Your onchain profile exists forever.' },
-  { n: '02', title: 'POST OR LIST', body: 'Lock USDC in escrow. Contract holds it until both sides confirm.' },
-  { n: '03', title: 'DELIVER', body: 'Submit proof. Approval releases USDC instantly — no invoices, no waiting.' },
-  { n: '04', title: 'EARN REPUTATION', body: 'Every completed tx updates your ChaosID score onchain. Immutable.' },
-]
 function HowStep({ n, title, body, delay }: { n: string; title: string; body: string; delay: number }) {
   return (
     <Reveal delay={delay} y={16}>
@@ -192,6 +192,13 @@ function Stat({ v, l, accent, delay }: { v: string; l: string; accent?: boolean;
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 export function LandingPage({ onEnter, onDocs }: { onEnter: () => void; onDocs: () => void }) {
+  const { t, locale } = useLocale()
+  const steps = [
+    { n: '01', title: t('landing.step1'), body: t('landing.step1body') },
+    { n: '02', title: t('landing.step2'), body: t('landing.step2body') },
+    { n: '03', title: t('landing.step3'), body: t('landing.step3body') },
+    { n: '04', title: t('landing.step4'), body: t('landing.step4body') },
+  ]
   return (
     <div className="relative text-white overflow-x-hidden"
       style={{ background: '#0a0a0a', fontFamily: "'JetBrains Mono', monospace" }}>
@@ -203,11 +210,12 @@ export function LandingPage({ onEnter, onDocs }: { onEnter: () => void; onDocs: 
           CHAOS<span style={{ color: ACCENT }}>//</span>
         </span>
         <div className="flex items-center gap-2 sm:gap-4">
-          <button onClick={onDocs} className="font-mono text-[9px] tracking-[0.18em] px-2 sm:px-3 py-2 text-white/35 hover:text-[#ff4d00] transition-colors duration-200">DOCS</button>
+          <LanguagePicker compact />
+          <button onClick={onDocs} className="font-mono text-[9px] tracking-[0.18em] px-2 sm:px-3 py-2 text-white/35 hover:text-[#ff4d00] transition-colors duration-200">{t('landing.docs')}</button>
           <button onClick={onEnter}
             className="font-mono text-[9px] tracking-[0.18em] px-3 sm:px-4 py-2 text-white/35 hover:text-[#ff4d00] transition-colors duration-200"
             style={{ border: '1px solid rgba(255,255,255,0.08)' }}>
-            LAUNCH APP →
+          {t('landing.launch')}
           </button>
         </div>
       </nav>
@@ -234,7 +242,7 @@ export function LandingPage({ onEnter, onDocs }: { onEnter: () => void; onDocs: 
           <motion.p
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15, duration: 1 }}
             className="font-mono text-[7px] sm:text-[8px] tracking-[0.3em] text-white/16 mb-8 sm:mb-10">
-            BUILT ON ARC · USDC AS GAS · CIRCLE SMART CONTRACT PLATFORM
+            {locale === 'vi' ? 'XÂY DỰNG TRÊN ARC · USDC LÀ GAS · CIRCLE SMART CONTRACT PLATFORM' : locale === 'zh' ? '基于 ARC · USDC 作为 GAS · CIRCLE 智能合约平台' : locale === 'ru' ? 'НА ARC · USDC ДЛЯ GAS · CIRCLE SMART CONTRACT PLATFORM' : 'BUILT ON ARC · USDC AS GAS · CIRCLE SMART CONTRACT PLATFORM'}
           </motion.p>
 
           <motion.h1
@@ -251,7 +259,7 @@ export function LandingPage({ onEnter, onDocs }: { onEnter: () => void; onDocs: 
             transition={{ delay: 0.45, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             className="mb-10 sm:mb-12">
             <p className="font-mono font-semibold" style={{ fontSize: 'clamp(0.9rem, 2.5vw, 1.7rem)', letterSpacing: '-0.015em' }}>
-              <span className="text-white/18">ONCHAIN</span>{' '}<WordCycle />
+              <span className="text-white/18">{t('landing.tagline')}</span>{' '}<WordCycle />
             </p>
           </motion.div>
 
@@ -262,13 +270,13 @@ export function LandingPage({ onEnter, onDocs }: { onEnter: () => void; onDocs: 
             <MagneticButton onClick={onEnter}
               className="font-mono font-black text-[10px] sm:text-[11px] tracking-[0.2em] px-8 sm:px-10 py-3.5 sm:py-4"
               style={{ background: ACCENT, color: '#000' }}>
-              ENTER APP →
+              {t('landing.enter')}
             </MagneticButton>
             <button
               onClick={() => document.getElementById('apps')?.scrollIntoView({ behavior: 'smooth' })}
               className="font-mono text-[10px] sm:text-[11px] tracking-[0.2em] px-7 sm:px-9 py-3.5 sm:py-4 text-white/22 hover:text-white/55 transition-colors"
               style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
-              EXPLORE ↓
+              {t('landing.explore')}
             </button>
           </motion.div>
         </div>
@@ -288,10 +296,10 @@ export function LandingPage({ onEnter, onDocs }: { onEnter: () => void; onDocs: 
       <div style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
         <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4"
           style={{ gap: '1px', background: 'rgba(255,255,255,0.04)' }}>
-          <Stat v="3" l="LIVE CONTRACTS" delay={0} />
-          <Stat v="ARC" l="CHAIN" delay={0.06} />
-          <Stat v="USDC" l="GAS TOKEN" delay={0.12} />
-          <Stat v="0" l="MIDDLEMEN" accent delay={0.18} />
+          <Stat v="3" l={t('landing.stat.contracts')} delay={0} />
+          <Stat v="ARC" l={t('landing.stat.chain')} delay={0.06} />
+          <Stat v="USDC" l={t('landing.stat.gas')} delay={0.12} />
+          <Stat v="0" l={t('landing.stat.middlemen')} accent delay={0.18} />
         </div>
       </div>
 
@@ -300,25 +308,25 @@ export function LandingPage({ onEnter, onDocs }: { onEnter: () => void; onDocs: 
         <Reveal>
           <div className="mb-12 sm:mb-16">
             <span className="font-mono text-[7px] sm:text-[8px] tracking-[0.28em] text-white/18 block mb-4">
-              THREE APPS · ONE ECOSYSTEM
+              {t('landing.appsEyebrow')}
             </span>
             <h2 className="font-mono font-black leading-none"
               style={{ fontSize: 'clamp(1.9rem, 5vw, 4.2rem)', letterSpacing: '-0.04em' }}>
-              EVERYTHING YOU NEED<br />
-              <span style={{ color: ACCENT }}>NOTHING YOU DON'T.</span>
+              {t('landing.appsTitle')}<br />
+              <span style={{ color: ACCENT }}>{t('landing.appsTitle2')}</span>
             </h2>
           </div>
         </Reveal>
         <div className="grid grid-cols-1 sm:grid-cols-3"
           style={{ gap: '1px', background: 'rgba(255,255,255,0.04)' }}>
-          <AppCard n="01" tag="CHAOS//ID" name="ONCHAIN IDENTITY"
-            desc="One profile per wallet. Reputation score built from real transactions across all three apps."
+          <AppCard n="01" tag="CHAOS//ID" name={t('landing.id.title')}
+            desc={t('landing.id.body')}
             accent={ACCENT} address="0x763cba888b02b29e3bf631fb78de732e439f54a9" delay={0} />
-          <AppCard n="02" tag="CHAOS//BOARD" name="BOUNTY ENGINE"
-            desc="Post a task, lock USDC as reward. Claimer delivers, you approve — funds release instantly."
+          <AppCard n="02" tag="CHAOS//BOARD" name={t('landing.board.title')}
+            desc={t('landing.board.body')}
             accent={BOARD_COLOR} address="0x01bb68f66c9397d60db9f845f07dadbf0eb67ed7" delay={0.07} />
-          <AppCard n="03" tag="CHAOS//MARKET" name="SERVICE MARKET"
-            desc="Seller lists, buyer funds escrow. 7-day protection built into the contract. No platform needed."
+          <AppCard n="03" tag="CHAOS//MARKET" name={t('landing.market.title')}
+            desc={t('landing.market.body')}
             accent={MARKET_COLOR} address="0x55203bc963be0731c8f013bc1de7f1fbb253b311" delay={0.14} />
         </div>
       </section>
@@ -330,7 +338,7 @@ export function LandingPage({ onEnter, onDocs }: { onEnter: () => void; onDocs: 
             <Reveal>
               <div className="md:sticky md:top-24">
                 <span className="font-mono text-[7px] sm:text-[8px] tracking-[0.28em] text-white/18 block mb-4">
-                  HOW IT WORKS
+                  {t('landing.how')}
                 </span>
                 <h2 className="font-mono font-black leading-[0.88]"
                   style={{ fontSize: 'clamp(2.6rem, 5vw, 4.8rem)', letterSpacing: '-0.04em' }}>
@@ -339,7 +347,7 @@ export function LandingPage({ onEnter, onDocs }: { onEnter: () => void; onDocs: 
               </div>
             </Reveal>
             <div>
-              {STEPS.map(({ n, title, body }, idx) => (
+              {steps.map(({ n, title, body }, idx) => (
                 <HowStep key={n} n={n} title={title} body={body} delay={idx * 0.08} />
               ))}
             </div>
@@ -352,7 +360,7 @@ export function LandingPage({ onEnter, onDocs }: { onEnter: () => void; onDocs: 
         <div className="max-w-5xl mx-auto px-5 sm:px-8 md:px-10 py-16 sm:py-20">
           <Reveal>
             <span className="font-mono text-[7px] sm:text-[8px] tracking-[0.28em] text-white/18 block mb-8">
-              LIVE ON ARC TESTNET
+              {t('landing.live')}
             </span>
           </Reveal>
           <div className="grid grid-cols-1 sm:grid-cols-3"
@@ -392,10 +400,10 @@ export function LandingPage({ onEnter, onDocs }: { onEnter: () => void; onDocs: 
               <MagneticButton onClick={onEnter}
                 className="font-mono font-black text-[11px] sm:text-[12px] tracking-[0.2em] px-10 sm:px-12 py-4 sm:py-5"
                 style={{ background: ACCENT, color: '#000' }}>
-                ENTER APP →
+                {t('landing.enter')}
               </MagneticButton>
               <span className="font-mono text-[7px] sm:text-[8px] tracking-[0.2em] text-white/14">
-                ARC TESTNET · NO REAL FUNDS NEEDED
+                {t('landing.ctaFoot')}
               </span>
             </div>
           </Reveal>

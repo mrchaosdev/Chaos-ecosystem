@@ -4,6 +4,7 @@ import { useAccount, useReadContract, useWriteContract, useWaitForTransactionRec
 import { erc20Abi, parseUnits, formatUnits } from 'viem'
 import { Plus, X, Tag, CheckCircle2, Truck, ShoppingBag, AlertTriangle, XCircle } from 'lucide-react'
 import { TiltCard, MagneticButton } from '@/components/MagneticButton'
+import { useLocale } from '@/i18n/LocaleProvider'
 
 import { toast } from 'sonner'
 
@@ -53,6 +54,7 @@ function InputField({ label, value, onChange, placeholder, type = 'text', rows, 
 }
 
 function CreateModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
+  const { t } = useLocale()
   const { address, chainId } = useAccount()
   const { switchChain } = useSwitchChain()
   const [title, setTitle] = useState('')
@@ -85,29 +87,29 @@ function CreateModal({ onClose, onCreated }: { onClose: () => void; onCreated: (
         <div className="flex items-start justify-between mb-6">
           <div>
             <p className="font-mono text-[9px] tracking-[0.22em] text-white/20 mb-1">CHAOS MARKET</p>
-            <h2 className="font-mono text-xl font-bold tracking-tight">LIST ITEM</h2>
+            <h2 className="font-mono text-xl font-bold tracking-tight">{t('market.createTitle')}</h2>
           </div>
           <button onClick={onClose} className="text-white/20 hover:text-white/70 transition-colors p-1 -mr-1"><X size={18} /></button>
         </div>
 
         <div className="space-y-4">
-          <InputField label="TITLE *" value={title} onChange={setTitle} placeholder="UI Kit, React component, copywriting..." />
-          <InputField label="DESCRIPTION" value={description} onChange={setDescription} rows={2} placeholder="What exactly do you deliver?" />
+          <InputField label={t('market.title')} value={title} onChange={setTitle} placeholder={t('market.titleHint')} />
+          <InputField label={t('market.description')} value={description} onChange={setDescription} rows={2} placeholder={t('market.descriptionHint')} />
           <div className="grid grid-cols-2 gap-3">
-            <InputField label="CATEGORY" value={category} onChange={() => {}}>
+            <InputField label={t('market.category')} value={category} onChange={() => {}}>
               <select value={category} onChange={e => setCategory(e.target.value)}
                 className="w-full bg-[#080808] border border-white/[0.08] px-3 py-2.5 font-mono text-xs text-white focus:outline-none appearance-none cursor-pointer"
                 style={{ color: CAT_COLORS[category] ?? 'white' }}>
                 {CATEGORIES.map(c => <option key={c} value={c}>{c.toUpperCase()}</option>)}
               </select>
             </InputField>
-            <InputField label="PRICE (USDC) *" value={price} onChange={setPrice} placeholder="25" type="number" />
+            <InputField label={t('market.price')} value={price} onChange={setPrice} placeholder="25" type="number" />
           </div>
         </div>
 
         {price && Number(price) > 0 && (
           <div className="mt-4 p-3.5 bg-[#0a0a0a] border border-white/[0.06] flex items-center justify-between">
-            <span className="font-mono text-[9px] tracking-widest text-white/25">LISTING PRICE</span>
+            <span className="font-mono text-[9px] tracking-widest text-white/25">{t('market.listingPrice')}</span>
             <span className="font-mono text-2xl font-bold tabular-nums" style={{ color: CAT_COLORS[category] ?? '#ff4d00', letterSpacing: '-0.02em' }}>
               {price}<span className="text-xs text-white/30 ml-1">USDC</span>
             </span>
@@ -125,7 +127,7 @@ function CreateModal({ onClose, onCreated }: { onClose: () => void; onCreated: (
           <button onClick={handleCreate} disabled={!canCreate || isPending}
             className="w-full font-mono text-[11px] tracking-[0.15em] py-3.5 transition-all disabled:opacity-25 disabled:cursor-not-allowed"
             style={{ background: '#ff4d00', color: '#000', fontWeight: 700 }}>
-            {isPending ? 'SIGN IN WALLET…' : 'CREATE LISTING →'}
+            {isPending ? t('market.sign') : t('market.createAction')}
           </button>
         </div>
       </motion.div>
@@ -291,6 +293,7 @@ function ListingCard({ id, categoryFilter, onAction }: ListingCardProps) {
 }
 
 export function ChaosMarketPage() {
+  const { t } = useLocale()
   const [showCreate, setShowCreate] = useState(false)
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null)
   const [refreshKey, setRefreshKey] = useState(0)
@@ -315,14 +318,14 @@ export function ChaosMarketPage() {
               CHAOS<span style={{ color: '#ff4d00' }}>//</span>MARKET
             </h1>
             <p className="font-mono text-[10px] text-white/20 tracking-widest mt-2">
-              {count} LISTINGS · USDC ESCROW · 7-DAY BUYER PROTECTION
+              {count} {t('market.heading')}
             </p>
           </motion.div>
           {address && (
             <MagneticButton onClick={() => setShowCreate(true)}
               className="flex items-center gap-2 font-mono text-[10px] tracking-[0.14em] px-5 py-3"
               style={{ background: '#ff4d00', color: '#000', fontWeight: 700 }}>
-              <Plus size={12} /> LIST ITEM
+              <Plus size={12} /> {t('market.create')}
             </MagneticButton>
           )}
         </div>
@@ -359,9 +362,9 @@ export function ChaosMarketPage() {
 
         {count === 0 ? (
           <div className="text-center py-24 border border-white/[0.04]">
-            <p className="font-mono text-xs text-white/15 tracking-widest">NO LISTINGS YET</p>
-            {address && <p className="font-mono text-[10px] text-white/10 mt-3">Be the first to list a service or product.</p>}
-            {!address && <p className="font-mono text-[10px] text-white/10 mt-3">Connect wallet to list an item.</p>}
+            <p className="font-mono text-xs text-white/15 tracking-widest">{t('market.none')}</p>
+            {address && <p className="font-mono text-[10px] text-white/10 mt-3">{t('market.emptyConnected')}</p>}
+            {!address && <p className="font-mono text-[10px] text-white/10 mt-3">{t('market.emptyDisconnected')}</p>}
           </div>
         ) : (
           <div className="space-y-2.5" key={refreshKey}>

@@ -5,6 +5,7 @@ import { erc20Abi, parseUnits, formatUnits } from 'viem'
 import { gsap } from 'gsap'
 import { Plus, Clock, User, X, Lock, AlertTriangle, XCircle, CheckCircle2 } from 'lucide-react'
 import { TiltCard, MagneticButton } from '@/components/MagneticButton'
+import { useLocale } from '@/i18n/LocaleProvider'
 
 import { toast } from 'sonner'
 
@@ -59,6 +60,7 @@ function InputField({ label, value, onChange, placeholder, type = 'text', rows }
 }
 
 function PostModal({ onClose, onPosted }: { onClose: () => void; onPosted: () => void }) {
+  const { t } = useLocale()
   const { address, chainId } = useAccount()
   const { switchChain } = useSwitchChain()
   const [title, setTitle] = useState('')
@@ -102,7 +104,7 @@ function PostModal({ onClose, onPosted }: { onClose: () => void; onPosted: () =>
         <div className="flex items-start justify-between mb-6">
           <div>
             <p className="font-mono text-[9px] tracking-[0.22em] text-white/20 mb-1">CHAOS BOARD</p>
-            <h2 className="font-mono text-xl font-bold tracking-tight">POST BOUNTY</h2>
+            <h2 className="font-mono text-xl font-bold tracking-tight">{t('board.createTitle')}</h2>
           </div>
           <button onClick={onClose} className="text-white/20 hover:text-white/70 transition-colors p-1 -mr-1">
             <X size={18} />
@@ -110,19 +112,19 @@ function PostModal({ onClose, onPosted }: { onClose: () => void; onPosted: () =>
         </div>
 
         <div className="space-y-4">
-          <InputField label="TITLE *" value={title} onChange={setTitle} placeholder="Build a landing page, design a logo..." />
-          <InputField label="DESCRIPTION" value={description} onChange={setDescription} rows={3} placeholder="Describe the task in detail..." />
+          <InputField label={t('board.title')} value={title} onChange={setTitle} placeholder={t('board.titleHint')} />
+          <InputField label={t('board.description')} value={description} onChange={setDescription} rows={3} placeholder={t('board.descriptionHint')} />
           <div className="grid grid-cols-2 gap-3">
-            <InputField label="REWARD (USDC) *" value={reward} onChange={setReward} placeholder="50" type="number" />
-            <InputField label="DEADLINE (DAYS)" value={days} onChange={setDays} type="number" />
+            <InputField label={t('board.reward')} value={reward} onChange={setReward} placeholder="50" type="number" />
+            <InputField label={t('board.deadline')} value={days} onChange={setDays} type="number" />
           </div>
         </div>
 
         {reward && Number(reward) > 0 && (
           <div className="mt-4 p-3.5 bg-[#0a0a0a] border border-white/[0.06] flex items-center justify-between">
             <div>
-              <p className="font-mono text-[9px] tracking-[0.2em] text-white/25">LOCKING IN ESCROW</p>
-              <p className="font-mono text-[9px] tracking-wider text-white/15 mt-0.5">2-step: approve → post</p>
+              <p className="font-mono text-[9px] tracking-[0.2em] text-white/25">{t('board.escrow')}</p>
+              <p className="font-mono text-[9px] tracking-wider text-white/15 mt-0.5">{t('board.twoStep')}</p>
             </div>
             <span className="font-mono text-2xl font-bold tabular-nums" style={{ color: '#ff4d00' }}>
               {reward}<span className="text-xs text-white/30 ml-1">USDC</span>
@@ -159,13 +161,13 @@ function PostModal({ onClose, onPosted }: { onClose: () => void; onPosted: () =>
             <button onClick={handleApprove} disabled={!canSubmit}
               className="w-full font-mono text-[11px] tracking-[0.15em] py-3.5 transition-all disabled:opacity-25 disabled:cursor-not-allowed"
               style={{ background: '#ff4d00', color: '#000', fontWeight: 700 }}>
-              1 / 2 — APPROVE USDC →
+              1 / 2 — {t('board.approve')} →
             </button>
           )}
           {step === 'approve' && (
             <div className="w-full font-mono text-[11px] tracking-[0.15em] py-3.5 text-center border border-white/[0.08]"
               style={{ color: approvePending ? '#ff4d00' : 'rgba(255,255,255,0.3)' }}>
-              {approvePending ? 'SIGN IN WALLET…' : 'CONFIRMING APPROVAL…'}
+              {approvePending ? t('board.sign') : `${t('board.approve')}…`}
             </div>
           )}
           {step === 'post' && (
@@ -173,13 +175,13 @@ function PostModal({ onClose, onPosted }: { onClose: () => void; onPosted: () =>
               disabled={postPending}
               className="w-full font-mono text-[11px] tracking-[0.15em] py-3.5 transition-all disabled:opacity-30"
               style={{ background: '#ff4d00', color: '#000', fontWeight: 700 }}>
-              {postPending ? 'SIGN IN WALLET…' : '2 / 2 — POST BOUNTY →'}
+              {postPending ? t('board.sign') : `2 / 2 — ${t('board.postAction')} →`}
             </button>
           )}
           {/* retry on error */}
           {txError && step !== 'form' && (
             <button onClick={() => setStep('form')} className="w-full font-mono text-[10px] tracking-widest py-2.5 border border-white/10 text-white/30 hover:text-white/60 transition-colors">
-              ← START OVER
+              {t('board.retry')}
             </button>
           )}
         </div>
@@ -315,6 +317,7 @@ function BountyCard({ id, filterStatus, onAction }: BountyCardProps) {
 }
 
 export function ChaosBoardPage() {
+  const { t } = useLocale()
   const [showPost, setShowPost] = useState(false)
   const [filter, setFilter] = useState<number | null>(null)
   const [refreshKey, setRefreshKey] = useState(0)
@@ -362,14 +365,14 @@ export function ChaosBoardPage() {
               CHAOS<span style={{ color: '#ff4d00' }}>//</span>BOARD
             </h1>
             <p className="font-mono text-[10px] text-white/20 tracking-widest mt-2">
-              <span ref={countRef}>{count}</span> BOUNTIES · USDC LOCKED IN ESCROW
+              <span ref={countRef}>{count}</span> {t('board.heading')}
             </p>
           </motion.div>
           {address && (
             <MagneticButton onClick={() => setShowPost(true)}
               className="flex items-center gap-2 font-mono text-[10px] tracking-[0.14em] px-5 py-3"
               style={{ background: '#ff4d00', color: '#000', fontWeight: 700 }}>
-              <Plus size={12} /> POST BOUNTY
+              <Plus size={12} /> {t('board.post')}
             </MagneticButton>
           )}
         </div>
@@ -382,7 +385,7 @@ export function ChaosBoardPage() {
             className="bg-[#ff4d00]/10 border-b border-[#ff4d00]/20 overflow-hidden">
             <div className="max-w-3xl mx-auto px-4 sm:px-6 py-3 flex items-center gap-3">
               <AlertTriangle size={12} className="text-[#ff4d00] shrink-0" />
-              <p className="font-mono text-[10px] tracking-wider text-[#ff4d00]">WRONG NETWORK — switch to ARC TESTNET to post or interact</p>
+              <p className="font-mono text-[10px] tracking-wider text-[#ff4d00]">{t('board.wrong')}</p>
             </div>
           </motion.div>
         )}
@@ -407,9 +410,9 @@ export function ChaosBoardPage() {
         {/* List */}
         {count === 0 ? (
           <div className="text-center py-24 border border-white/[0.04]">
-            <p className="font-mono text-xs text-white/15 tracking-widest">NO BOUNTIES YET</p>
-            {address && <p className="font-mono text-[10px] text-white/10 mt-3">Post the first bounty to get started.</p>}
-            {!address && <p className="font-mono text-[10px] text-white/10 mt-3">Connect wallet to post a bounty.</p>}
+            <p className="font-mono text-xs text-white/15 tracking-widest">{t('board.none')}</p>
+            {address && <p className="font-mono text-[10px] text-white/10 mt-3">{t('board.emptyConnected')}</p>}
+            {!address && <p className="font-mono text-[10px] text-white/10 mt-3">{t('board.emptyDisconnected')}</p>}
           </div>
         ) : (
           <div className="space-y-2.5" key={refreshKey}>

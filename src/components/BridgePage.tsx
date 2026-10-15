@@ -1,7 +1,9 @@
 import { motion } from 'framer-motion'
 import { BridgePanel } from '@/components/BridgePanel'
+import { useLocale } from '@/i18n/LocaleProvider'
 
 export function BridgePage() {
+  const { t } = useLocale()
   return (
     <div className="min-h-dvh bg-[#080808] text-white pt-14">
       <div className="border-b border-white/[0.06] bg-[#0a0a0a]">
@@ -12,7 +14,7 @@ export function BridgePage() {
               CHAOS<span style={{ color: '#ff4d00' }}>//</span>BRIDGE
             </h1>
             <p className="font-mono text-[10px] text-white/20 tracking-widest mt-2">
-              MOVE USDC ACROSS CHAINS · CCTP V2 · 8-20 SEC
+              {t('bridge.subtitle')}
             </p>
           </motion.div>
         </div>
@@ -26,9 +28,9 @@ export function BridgePage() {
         {/* Info cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-px bg-white/[0.04] mt-4">
           {[
-            { label: 'PROTOCOL', value: 'CCTP V2' },
-            { label: 'SPEED', value: '~8-20 SEC' },
-            { label: 'FEE', value: 'NETWORK ONLY' },
+            { label: t('bridge.protocol'), value: 'CCTP V2' },
+            { label: t('bridge.speed'), value: '~8-20 SEC' },
+            { label: t('bridge.fee'), value: t('bridge.networkFee') },
           ].map(({ label, value }) => (
             <div key={label} className="bg-[#0a0a0a] px-5 py-4">
               <p className="font-mono text-[9px] tracking-[0.2em] text-white/20 mb-1">{label}</p>

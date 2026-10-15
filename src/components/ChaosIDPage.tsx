@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import { buildTxExplorerUrl, requireChain } from '@/onchain-facts'
 import { MultiChainBalance } from '@/components/MultiChainBalance'
+import { useLocale } from '@/i18n/LocaleProvider'
 import { AdminPanel } from '@/components/AdminPanel'
 import type { ChaosProfile } from '@/types'
 
@@ -220,6 +221,7 @@ function ActivityLists({ address }: { address: string }) {
 }
 
 export function ChaosIDPage({ sharedAddress }: { sharedAddress?: string | null }) {
+  const { t } = useLocale()
   const { address, isConnected, chainId } = useAccount()
   const { switchChain } = useSwitchChain()
   const [lookupAddress, setLookupAddress] = useState('')
@@ -289,9 +291,9 @@ export function ChaosIDPage({ sharedAddress }: { sharedAddress?: string | null }
             className="bg-[#ff4d00]/10 border-b border-[#ff4d00]/20 overflow-hidden">
             <div className="max-w-4xl mx-auto px-4 sm:px-6 py-2.5 flex items-center gap-2">
               <AlertTriangle size={12} className="text-[#ff4d00] shrink-0" />
-              <p className="font-mono text-[10px] tracking-wider text-[#ff4d00]">WRONG NETWORK — switch to ARC TESTNET</p>
+              <p className="font-mono text-[10px] tracking-wider text-[#ff4d00]">{t('id.wrong')}</p>
               <button onClick={() => switchChain({ chainId: ARC_TESTNET_ID })}
-                className="ml-auto font-mono text-[10px] text-[#ff4d00] underline underline-offset-2">SWITCH</button>
+                className="ml-auto font-mono text-[10px] text-[#ff4d00] underline underline-offset-2">{t('id.switch')}</button>
             </div>
           </motion.div>
         )}
@@ -314,7 +316,7 @@ export function ChaosIDPage({ sharedAddress }: { sharedAddress?: string | null }
               <input type="text" value={lookupAddress}
                 onChange={e => { setLookupAddress(e.target.value); setLookupError('') }}
                 onKeyDown={e => e.key === 'Enter' && handleLookup()}
-                placeholder="Lookup 0x..."
+                placeholder={t('id.lookup')}
                 className="w-full bg-transparent border border-white/[0.07] font-mono text-xs text-white placeholder-white/15 px-3 py-2 focus:outline-none focus:border-[#ff4d00]/40 transition-colors" />
             </div>
             <button onClick={handleLookup}
@@ -335,7 +337,7 @@ export function ChaosIDPage({ sharedAddress }: { sharedAddress?: string | null }
         {!targetAddress ? (
           <div className="border border-white/[0.05] py-20 text-center">
             <Wallet size={24} className="text-white/10 mx-auto mb-3" />
-            <p className="font-mono text-xs text-white/20 tracking-widest">CONNECT WALLET TO VIEW YOUR DASHBOARD</p>
+            <p className="font-mono text-xs text-white/20 tracking-widest">{t('id.connect')}</p>
           </div>
         ) : (
           <>
@@ -365,7 +367,7 @@ export function ChaosIDPage({ sharedAddress }: { sharedAddress?: string | null }
                 {/* USDC balance */}
                 <div className="p-5">
                   <p className="font-mono text-[9px] tracking-[0.2em] text-white/20 mb-2 flex items-center gap-1.5">
-                    <Wallet size={9} /> USDC BALANCE
+                    <Wallet size={9} /> {t('id.usdc')}
                   </p>
                   <p className="font-mono font-black tabular-nums leading-none text-white" style={{ fontSize: 'clamp(1.4rem, 3vw, 2rem)', letterSpacing: '-0.03em' }}>
                     <AnimatedNumber value={usdcAmount} prefix="$" />
@@ -376,7 +378,7 @@ export function ChaosIDPage({ sharedAddress }: { sharedAddress?: string | null }
                 {/* Gas balance */}
                 <div className="p-5">
                   <p className="font-mono text-[9px] tracking-[0.2em] text-white/20 mb-2 flex items-center gap-1.5">
-                    <Zap size={9} /> GAS BALANCE
+                    <Zap size={9} /> {t('id.gas')}
                   </p>
                   <p className="font-mono font-black tabular-nums leading-none text-white" style={{ fontSize: 'clamp(1.4rem, 3vw, 2rem)', letterSpacing: '-0.03em' }}>
                     {nativeAmount > 0 ? nativeAmount.toFixed(4) : '—'}
@@ -387,26 +389,26 @@ export function ChaosIDPage({ sharedAddress }: { sharedAddress?: string | null }
                 {/* Reputation */}
                 <div className="p-5">
                   <p className="font-mono text-[9px] tracking-[0.2em] text-white/20 mb-2 flex items-center gap-1.5">
-                    <Shield size={9} /> REPUTATION
+                    <Shield size={9} /> {t('id.reputation')}
                   </p>
                   <p className="font-mono font-black tabular-nums leading-none" style={{ fontSize: 'clamp(1.4rem, 3vw, 2rem)', letterSpacing: '-0.03em', color: isRegistered ? tier.color : 'rgba(255,255,255,0.1)' }}>
                     <AnimatedNumber value={score} />
                   </p>
                   <p className="font-mono text-[9px] mt-1" style={{ color: isRegistered ? `${tier.color}70` : 'rgba(255,255,255,0.1)' }}>
-                    {isRegistered ? tier.label : 'UNREGISTERED'}
+                    {isRegistered ? tier.label : t('id.unregistered')}
                   </p>
                 </div>
 
                 {/* Tx count */}
                 <div className="p-5">
                   <p className="font-mono text-[9px] tracking-[0.2em] text-white/20 mb-2 flex items-center gap-1.5">
-                    <Activity size={9} /> TRANSACTIONS
+                    <Activity size={9} /> {t('id.transactions')}
                   </p>
                   <p className="font-mono font-black tabular-nums leading-none text-white" style={{ fontSize: 'clamp(1.4rem, 3vw, 2rem)', letterSpacing: '-0.03em' }}>
                     <AnimatedNumber value={isRegistered && profile ? Number(profile.txCount) : 0} delay={0.1} />
                   </p>
                   <p className="font-mono text-[9px] text-white/20 mt-1">
-                    {isRegistered && profile ? `$${(Number(profile.volumeUsdc) / 1e6).toFixed(2)} VOLUME` : 'NO HISTORY'}
+                    {isRegistered && profile ? `$${(Number(profile.volumeUsdc) / 1e6).toFixed(2)} VOLUME` : t('id.noHistory')}
                   </p>
                 </div>
               </div>
@@ -431,11 +433,11 @@ export function ChaosIDPage({ sharedAddress }: { sharedAddress?: string | null }
                 {isConnected && isOwnProfile && !isRegistered && (
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                     className="px-5 pb-5 pt-3 border-t border-white/[0.05]">
-                    <p className="font-mono text-[10px] text-white/25 mb-3">Register once to start tracking reputation across ChaosBoard and ChaosMarket.</p>
+                    <p className="font-mono text-[10px] text-white/25 mb-3">{t('id.registerInfo')}</p>
                     <button onClick={handleRegister} disabled={isPending || isConfirming || wrongChain}
                       className="font-mono text-[11px] tracking-[0.15em] px-6 py-3 transition-all disabled:opacity-30"
                       style={{ background: '#ff4d00', color: '#000', fontWeight: 800 }}>
-                      {isPending ? 'CONFIRM IN WALLET…' : isConfirming ? 'REGISTERING…' : 'REGISTER IDENTITY →'}
+                      {isPending ? `${t('nav.connect')}…` : isConfirming ? '…' : t('id.register')}
                     </button>
                     {writeError && (
                       <div className="mt-2 flex items-start gap-2 p-2.5 border border-red-500/20 bg-red-500/5">
@@ -447,7 +449,7 @@ export function ChaosIDPage({ sharedAddress }: { sharedAddress?: string | null }
                       <div className="mt-2 flex items-center justify-between px-3 py-2 border border-emerald-500/20 bg-emerald-500/5">
                         <div className="flex items-center gap-2">
                           <CheckCircle2 size={11} className="text-emerald-400" />
-                          <span className="font-mono text-[10px] text-emerald-400">REGISTERED</span>
+                          <span className="font-mono text-[10px] text-emerald-400">{t('id.registered')}</span>
                         </div>
                         <a href={buildTxExplorerUrl(ARC_TESTNET_ID, txHash)} target="_blank" rel="noopener noreferrer"
                           className="flex items-center gap-1 font-mono text-[10px] text-white/30 hover:text-white">
