@@ -1,0 +1,19 @@
+﻿# Dependencies and local secrets
+node_modules/
+.env
+.env.*
+!.env.example
+
+# Build and local tool output
+contracts/cache/
+contracts/out/
+coverage/
+dist/
+*.log
+console.jsonl
+traces.jsonl
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.vscode/
